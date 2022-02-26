@@ -1,5 +1,6 @@
 import requests
 import pickle
+from time import sleep
 
 API_URL = "https://xmrchain.net/api"
 
@@ -30,7 +31,8 @@ def get_tx_data():
                             print()
         except Exception as e:
             skipped_transactions += 1
-            print("Skipped Transaction:", skipped_transactions)
+            print("Skipped Transactions:", skipped_transactions)
+            sleep(1)
         starting_block -= 1
         print("Block: ", starting_block)
         print()
@@ -41,7 +43,7 @@ def get_tx_data():
 def make_csv():
     with open("data.pkl", "rb") as fp:
         data = pickle.load(fp)
-    with open("data.csv", "a") as fp:
+    with open("data.csv", "w") as fp:
         fp.write("tx_fee,tx_size,num_inputs,num_outputs,fee_per_kB\n")
         for tx in data:
             fp.write(str(tx['tx_fee']) + "," + \
