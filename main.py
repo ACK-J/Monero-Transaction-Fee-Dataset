@@ -27,11 +27,13 @@ def get_tx_data():
                             transaction["num_outputs"] = len(tx_response["outputs"])
                             num_transactions += 1
                             print(transaction)
+                            data.append(transaction)
                             print("Transactions:", num_transactions)
                             print()
         except Exception as e:
             skipped_transactions += 1
             print("Skipped Transactions:", skipped_transactions)
+            print()
             sleep(1)
         starting_block -= 1
         print("Block: ", starting_block)
@@ -44,13 +46,9 @@ def make_csv():
     with open("data.pkl", "rb") as fp:
         data = pickle.load(fp)
     with open("data.csv", "w") as fp:
-        fp.write("tx_fee,tx_size,num_inputs,num_outputs,fee_per_kB\n")
+        fp.write("tx_fee,tx_size,num_inputs,num_outputs\n")
         for tx in data:
-            fp.write(str(tx['tx_fee']) + "," + \
-                     str(tx['tx_size']) + "," + \
-                     str(tx['num_inputs']) + "," + \
-                     str(tx['num_outputs']) + "," + \
-                     str(tx['fee_per_kB']) + "," + "\n")
+            fp.write(str(tx['tx_fee']) + "," + str(tx['tx_size']) + "," + str(tx['num_inputs']) + "," + str(tx['num_outputs']) + "\n")
 
 
 def main():
