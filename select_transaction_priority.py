@@ -6,7 +6,7 @@ https://user-images.githubusercontent.com/60232273/155869893-2146401b-6cc6-4b41-
 """
 
 def main():
-    with open("xmr_tx_fee_distribution.pkl", "rb") as fp:
+    with open("data.pkl", "rb") as fp:
         data = pickle.load(fp)
         # 1 0.00000005
         # 2 0.00000015
