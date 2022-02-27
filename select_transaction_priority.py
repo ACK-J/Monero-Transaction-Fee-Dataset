@@ -1,9 +1,12 @@
 import pickle
 import random
 
+"""
+https://user-images.githubusercontent.com/60232273/155869893-2146401b-6cc6-4b41-be57-74b5e58624ed.png
+"""
 
 def main():
-    with open("data.pkl", "rb") as fp:
+    with open("xmr_tx_fee_distribution.pkl", "rb") as fp:
         data = pickle.load(fp)
         # 1 0.00000005
         # 2 0.00000015
