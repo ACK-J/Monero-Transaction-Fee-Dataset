@@ -46,9 +46,9 @@ def make_csv():
     with open("data.pkl", "rb") as fp:
         data = pickle.load(fp)
     with open("data.csv", "w") as fp:
-        fp.write("tx_fee,tx_size,num_inputs,num_outputs\n")
+        fp.write("tx_fee,tx_size,num_inputs,num_outputs,tx_fee/tx_size\n")
         for tx in data:
-            fp.write(str(tx['tx_fee']) + "," + str(tx['tx_size']) + "," + str(tx['num_inputs']) + "," + str(tx['num_outputs']) + "\n")
+            fp.write(str(int(tx['tx_fee']) * 0.000000000001) + "," + str(tx['tx_size']) + "," + str(tx['num_inputs']) + "," + str(tx['num_outputs']) + "," + str((int(tx['tx_fee']) * 0.000000000001)/int(tx['tx_size'])) + "\n")
 
 
 def main():
