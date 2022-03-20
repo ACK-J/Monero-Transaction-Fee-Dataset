@@ -2,12 +2,14 @@ import requests
 import pickle
 from time import sleep
 from typing import List, Dict, Any
+from loguru import logger
 
 # Parameters
 API_URL: str = "https://xmrchain.net/api"
-desired_transaction_count: int = 5
+desired_transaction_count: int = 5_000  # how many transactions to scrape overall
+success_sleep_time: float = 0.25  # (after a successful transaction request)
 exception_sleep_time: float = 1.0
-success_sleep_time: float = 0.5
+atomic_scale: float = 0.000000000001
 
 
 # Transaction scraper
@@ -18,12 +20,12 @@ def get_tx_data():
     while len(data) < desired_transaction_count:
         try:
             # Retrieve the next block and confirm that the response is good
-            response: requests.Response = requests.get(API_URL + "/block/" + str(starting_block))
-            if response.status_code == 200 and 'application/json' in response.headers.get('Content-Type', ''):
-                txs = response.json()["data"]["txs"]
-                print(f"\nRetrieved block {starting_block} containing {len(txs)} transactions...")
+            block_raw: requests.Response = requests.get(API_URL + "/block/" + str(starting_block))
+            if block_raw.status_code == 200 and 'application/json' in block_raw.headers.get('Content-Type', ''):
+                txs = block_raw.json()["data"]["txs"]
+                logger.info(f"\nRetrieved block {starting_block} containing {len(txs)} transactions...")
             else:
-                print(f"\nIssue retrieving block {starting_block}... Continuing")
+                logger.info(f"\nIssue retrieving block {starting_block}... Continuing")
                 continue
 
             # Loop over non-coinbase transactions
@@ -41,11 +43,11 @@ def get_tx_data():
 
                 # Add to the data and log
                 data.append(transaction)
-                print(f"\n[Collected {len(data)} of {desired_transaction_count} total]\nNew entry: {transaction}")
+                logger.info(f"\n[Collected {len(data)} of {desired_transaction_count} total]\nNew entry: {transaction}")
 
         except Exception as e:
             skipped_transactions += 1
-            print(f"Encountered exception {e}\nTotal skip count: {skipped_transactions}\n")
+            logger.info(f"Encountered exception {e}\nTotal skip count: {skipped_transactions}\n")
             sleep(exception_sleep_time)
 
         starting_block -= 1
@@ -60,8 +62,8 @@ def make_csv():
     with open("data.csv", "w") as fp:
         fp.write("tx_fee,tx_size,num_inputs,num_outputs,tx_fee/tx_size\n")
         for tx in data:
-            fp.write(f"{int(tx['tx_fee']) * 0.000000000001},{tx['tx_size']},{tx['num_inputs']},{tx['num_outputs']}," +
-                     f"{(int(tx['tx_fee']) * 0.000000000001) / int(tx['tx_size'])}\n")
+            fp.write(f"{int(tx['tx_fee']) * atomic_scale},{tx['tx_size']},{tx['num_inputs']},{tx['num_outputs']}," +
+                     f"{(int(tx['tx_fee']) * atomic_scale) / int(tx['tx_size'])}\n")
 
 
 def main():
